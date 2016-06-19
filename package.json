@@ -1,0 +1,15 @@
+{
+  "name": "megabus-crawler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chris Dobbins",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.20.0",
+    "request-promise": "^3.0.0"
+  }
+}

@@ -1,8 +1,10 @@
 'use strict';
 const requestPromise = require('request-promise'),
+request = require('request'),
 cheerio = require('cheerio'),
 fs = require('fs'),
-allOrigins = mapOriginIds();
+allOrigins = mapOriginIds(); // will need to modify this so that
+                                             // it gets data from live site
 
 let mainPageOptions = {
   uri: 'http://us.megabus.com/Default.aspx',
@@ -45,12 +47,10 @@ function main() {
     console.log(destinations);
     journeyOptions.originCode = ;
     let testDestination = destinations[0];
-
-
   });
 
 
-  // following lines of code calls the JourneyResults method
+  // following lines of code call the JourneyResults method
   // on Megabus's backend
   // requestPromise(journeyOptions)
   // .then( (data) => {
@@ -82,8 +82,7 @@ function getAvailableDestinations(originName) {
     return;
   }
   return requestPromise(destinationOptions).then( data => {
-    //console.log(data); // stopped here @ 1600 on Sunday,
-                                    // 6/19
+    //console.log(data);
      allAvailableDestinations = data.d.map( currVal => {
        let destination = {};
        destination.city = currVal.descriptionField;

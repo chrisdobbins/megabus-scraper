@@ -34,33 +34,29 @@ requestPromise(mainPageOptions) // crawls home page to get origin IDs
     let testOrigin = availableDestinations.origin;
     getTripInfo(testOrigin, testDestination, testDepartureDate)
     .then( (tripInfo) => {
-       let $ = cheerio.load(tripInfo);
-     //   prints price of ticket in '$xx.xx' format
-     //let gridNum = 'l20'; // lowercase L-zero-zero
-     //let gridLine1 = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-    let i = 0;
-    let gridNum = 'l00';
-    let gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-    let departures = [];
-     while ($(gridLineId).children().eq(0).text()) {
-       gridNum = (i < 10) ? `l0${i}` : `l${i}`;
-       gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-       // console.log($(gridLineId).children().eq(0).text().split(/[\s]+/)[2]);
-       // departure time below
-       let ampmFlag = $(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[3];
-       // console.log(`${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`);
-       let departure = {};
-      if ($(gridLineId).children().eq(0).text()) {
-        departure.time = `${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`;
-        departure.price = $(gridLineId).children().eq(0).text().split(/[\s]+/)[2];
-        departures.push(departure);
-      }
-       i++;
+      let $ = cheerio.load(tripInfo);
+      let i = 0;
+      let gridNum = 'l00';
+      let gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
+      let departures = [];
+       while ($(gridLineId).children().eq(0).text()) {
+         gridNum = (i < 10) ? `l0${i}` : `l${i}`;
+         gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
+         // console.log($(gridLineId).children().eq(0).text().split(/[\s]+/)[2]);
+         // departure time below
+         let ampmFlag = $(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[3];
+         // console.log(`${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`);
+         let departure = {};
+         if ($(gridLineId).children().eq(0).text()) {
+           departure.time = `${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`;
+           departure.price = $(gridLineId).children().eq(0).text().split(/[\s]+/)[2];
+           departures.push(departure);
+         }
+         i++;
     }
     console.log(departures); // left off here 6/19, 2254
     });
   });
-
   });
 }
 
@@ -141,6 +137,3 @@ function mapOriginIds(data) {
 }
 
 main();
-
-
-// http://us.megabus.com/JourneyResults.aspx?originCode=289&destinationCode=290&outboundDepartureDate=7%2f1%2f2016&inboundDepartureDate=&passengerCount=1&transportType=0&concessionCount=0&nusCount=0&outboundWheelchairSeated=0&outboundOtherDisabilityCount=0&inboundWheelchairSeated=0&inboundOtherDisabilityCount=0&outboundPcaCount=0&inboundPcaCount=0&promotionCode=&withReturn=0

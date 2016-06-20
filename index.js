@@ -10,11 +10,6 @@ let mainPageOptions = {
     }
 };
 
-// options for GET request to http://us.megabus.com/support/journeyplanner.svc/GetDestinations?originId=<someId>
-
-
-
-
 function main() {
 requestPromise(mainPageOptions) // crawls home page to get origin IDs
 .then( (homePage) => {

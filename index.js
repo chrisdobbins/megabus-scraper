@@ -1,10 +1,7 @@
 'use strict';
 const requestPromise = require('request-promise'),
-request = require('request'),
 cheerio = require('cheerio'),
-fs = require('fs'),
-allOrigins = mapOriginIds(); // will need to modify this so that
-                                             // it gets data from live site
+fs = require('fs');
 
 let mainPageOptions = {
   uri: 'http://us.megabus.com/Default.aspx',
@@ -38,15 +35,17 @@ let journeyOptions = {
   };
 
 function main() {
-//requestPromise(mainPageOptions)
-//.then( (data) => {
+requestPromise(mainPageOptions)
+.then( (homePage) => {
+  const allOrigins = mapOriginIds(homePage);
   let originCity = process.argv[2];
-  let destinationCity = process.argv[3];
-  let outboundDepartureDate = process.argv[4];
-  getAvailableDestinations(originCity).then(destinations => {
-    console.log(destinations);
-    journeyOptions.originCode = ;
-    let testDestination = destinations[0];
+//  let destinationCity = process.argv[3];
+//  let outboundDepartureDate = process.argv[4];
+
+  getAvailableDestinations(originCity, allOrigins).then(availableDestinations => {
+   //  console.log(availableDestinations);
+    //journeyOptions.originCode = ;
+    let testDestination = availableDestinations[0];
   });
 
 
@@ -57,10 +56,10 @@ function main() {
   //   let $ = cheerio.load(data);
   //   prints price of ticket in '$xx.xx' format
   //   console.log($('#JourneyResylts_OutboundList_GridViewResults_ctl00_row_item li.five').children().eq(0).text().split(/[\s]+/)[2]);
-  // } );
+  });
 }
 
-function getAvailableDestinations(originName) {
+function getAvailableDestinations(originName, allOrigins) {
   let destinationOptions = {
     uri: 'http://us.megabus.com/support/journeyplanner.svc/GetDestinations',
     qs: {
@@ -71,7 +70,7 @@ function getAvailableDestinations(originName) {
   allAvailableDestinations = [];
 
   allOrigins.forEach( currCity => {
-    if (currCity.city == process.argv[2]) {
+    if (currCity.city === process.argv[2]) {
       destinationOptions.qs.originId = parseInt(currCity.id);
       console.log(destinationOptions.qs.originId);
       return
@@ -93,8 +92,8 @@ function getAvailableDestinations(originName) {
   });
 }
 
-function mapOriginIds() {
-  let data = fs.readFileSync('/home/cj/megabus-crawler/megabus-home.html');
+function mapOriginIds(data) {
+  // let data = fs.readFileSync('/home/cj/megabus-crawler/megabus-home.html');
   let $ = cheerio.load(data);
 
   let origins = [];

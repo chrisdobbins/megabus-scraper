@@ -21,7 +21,7 @@ requestPromise(mainPageOptions) // crawls home page to get origin IDs
   const allOrigins = mapOriginIds(homePage);  //creates array of city name and id objs
   let originCity = process.argv[2];
   let destinationCity = process.argv[3];
-//  let outboundDepartureDate = process.argv[4];
+  let outboundDepartureDate = process.argv[4];
 
 // gets the destinations available for the desired origin
   getAvailableDestinations(originCity, allOrigins).
@@ -35,9 +35,8 @@ requestPromise(mainPageOptions) // crawls home page to get origin IDs
       }
       return;
     });
-    let testDepartureDate = '07/07/2016';
+    let testDepartureDate = outboundDepartureDate;
     let testOrigin = availableDestinations.origin;
-
     getTripInfo(testOrigin, testDestination, testDepartureDate)
     .then( (tripInfo) => {
        let $ = cheerio.load(tripInfo);
@@ -47,12 +46,23 @@ requestPromise(mainPageOptions) // crawls home page to get origin IDs
     let i = 0;
     let gridNum = 'l00';
     let gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
+    let departures = [];
      while ($(gridLineId).children().eq(0).text()) {
        gridNum = (i < 10) ? `l0${i}` : `l${i}`;
        gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-       console.log($(gridLineId).children().eq(0).text().split(/[\s]+/)[2]);
+       // console.log($(gridLineId).children().eq(0).text().split(/[\s]+/)[2]);
+       // departure time below
+       let ampmFlag = $(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[3];
+       // console.log(`${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`);
+       let departure = {};
+      if ($(gridLineId).children().eq(0).text()) {
+        departure.time = `${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`;
+        departure.price = $(gridLineId).children().eq(0).text().split(/[\s]+/)[2];
+        departures.push(departure);
+      }
        i++;
     }
+    console.log(departures); // left off here 6/19, 2254
     });
   });
 

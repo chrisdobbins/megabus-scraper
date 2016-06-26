@@ -57,11 +57,15 @@ function main() {
                                                 departure.state = `${departureDetails[4]}`;
                                                 // additional processing to get rid of leading ',' character in location
                                                 departure.location = unparsedDepartureLocation.slice(1).join(' ');
-                                                departure.price = $(gridLineId).children().eq(0).text().split(/[\s]+/)[2];
+                                                // where price appears depends on availability of reserved seats.
+                                                // reserved seats' fare descriptions will start with 'From'
+                                                let priceInfoArr = $('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`).text().trim().split(/[\s]+/);
+                                                priceInfoArr[0] === 'From' ?
+                                                    departure.price = priceInfoArr[1] : departure.price = priceInfoArr[0];
                                                 departures.push(departure);
-         }
-         i++;
-    }
+                                            }
+                                            i++;
+                                        }
     console.log(departures); // left off here 6/19, 2254
     });
   });
@@ -143,6 +147,7 @@ function mapOriginIds(data) {
   }
   return origins;
 }
+
 
 main();
 

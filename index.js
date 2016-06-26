@@ -44,15 +44,13 @@ function main() {
 }
 
 function parseTripInfo(tripInfo) {
-  let $ = cheerio.load(tripInfo);
-  let i = 0;
-  let gridNum = 'l00';
-  let gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-  let trips = [];
-  while ($(gridLineId).children().eq(0).text()) {
+  let $ = cheerio.load(tripInfo),
+      i = 0,
+      gridNum = 'l00',
+      trips = [];
+  while ($(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`).children().eq(0).text()) {
       gridNum = (i < 10) ? `l0${i}` : `l${i}`;
-      gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-      // console.log(`${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`);
+      let gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
       let trip = {};
       if ($(gridLineId).children().eq(0).text()) {
         // TODO: DRY this up
@@ -65,7 +63,7 @@ function parseTripInfo(tripInfo) {
           trip.departurestate = `${departureDetails[4]}`;
           // where price appears depends on availability of reserved seats.
           // reserved seats' fare descriptions will start with 'From'
-          let priceInfoArr = eliminateWhiteSpace($('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`).text());
+          let priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
           priceInfoArr[0] === 'From' ?
               trip.price = priceInfoArr[1] : departure.price = priceInfoArr[0];
 

@@ -22,15 +22,15 @@ function main() {
             // gets the destinations available for the desired origin
             getAvailableDestinations(originCity, allOrigins).
             then(availableDestinations => {
-                let testDestination = verifyDestinationInput(availableDestinations, destinationCity);
+                let destination = verifyDestinationInput(availableDestinations, destinationCity);
                 let departureDate = outboundDepartureDate;
                 let origin = availableDestinations.origin;
-                getTripInfo(origin, testDestination, departureDate)
+                getTripInfo(origin, destination, departureDate)
                     .then(tripInfo => {
                       // TODO: Refactor this block into fn called parseTripInfo
                       let trips = parseTripInfo(tripInfo);
                       console.log(trips); // left off here 6/26, 0101
-                    });
+                });
             });
         });
 }

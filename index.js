@@ -13,33 +13,34 @@ let mainPageOptions = {
 function main() {
     requestPromise(mainPageOptions) // crawls home page to get origin IDs
         .then(homePage => {
-                const allOrigins = mapOriginIds(homePage); //creates array of city name and id objs
-                let originCity = process.argv[2];
-                let destinationCity = process.argv[3];
-                let outboundDepartureDate = process.argv[4];
+            const allOrigins = mapOriginIds(homePage); //creates array of city name and id objs
+            // need to sanitize input rather than blindly trusting.
+            let originCity = process.argv[2];
+            let destinationCity = process.argv[3];
+            let outboundDepartureDate = process.argv[4];
 
-                // gets the destinations available for the desired origin
-                getAvailableDestinations(originCity, allOrigins).
-                then(availableDestinations => {
-                            let testDestination = '';
-                            // test block for functionality to pass in destination name
-                            // TODO: refactor this
-                            availableDestinations.destinations.forEach((destination) => {
-                                if (destination.city === destinationCity) {
-                                    testDestination = destination;
-                                }
-                                return;
-                            });
-                            let testDepartureDate = outboundDepartureDate;
-                            let testOrigin = availableDestinations.origin;
-                            getTripInfo(testOrigin, testDestination, testDepartureDate)
-                                .then(tripInfo => {
-                                  // TODO: Refactor this block into fn called parseTripInfo
-                                  let trips = parseTripInfo(tripInfo);
-                                  console.log(trips); // left off here 6/26, 0101
-    });
-  });
-  });
+            // gets the destinations available for the desired origin
+            getAvailableDestinations(originCity, allOrigins).
+            then(availableDestinations => {
+                let testDestination = '';
+                // test block for functionality to pass in destination name
+                // TODO: refactor this
+                availableDestinations.destinations.forEach((destination) => {
+                    if (destination.city === destinationCity) {
+                        testDestination = destination;
+                    }
+                    return;
+                });
+                let testDepartureDate = outboundDepartureDate;
+                let testOrigin = availableDestinations.origin;
+                getTripInfo(testOrigin, testDestination, testDepartureDate)
+                    .then(tripInfo => {
+                      // TODO: Refactor this block into fn called parseTripInfo
+                      let trips = parseTripInfo(tripInfo);
+                      console.log(trips); // left off here 6/26, 0101
+                    });
+            });
+        });
 }
 
 function parseTripInfo(tripInfo) {

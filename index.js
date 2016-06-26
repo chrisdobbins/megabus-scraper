@@ -39,35 +39,44 @@ function main() {
                                         let i = 0;
                                         let gridNum = 'l00';
                                         let gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-                                        let departures = [];
+                                        let trips = [];
                                         while ($(gridLineId).children().eq(0).text()) {
                                             gridNum = (i < 10) ? `l0${i}` : `l${i}`;
                                             gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
                                             // console.log(`${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`);
-                                            let departure = {};
+                                            let trip = {};
                                             if ($(gridLineId).children().eq(0).text()) {
                                                 let departureDetails = eliminateWhiteSpace($(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text());
                                                 let unparsedDepartureLocation = departureDetails.slice(5);
                                                 let unparsedDepartureCity = departureDetails[3];
-                                                departure.time = `${departureDetails[1]} ${departureDetails[2]}`;
+                                                trip.departuretime = `${departureDetails[1]} ${departureDetails[2]}`;
                                                 // add'l procesing to get rid of trailing ',' character in city
-                                                departure.city = unparsedDepartureCity.slice(0, departureDetails[4].lastIndexOf(','));
-                                                departure.state = `${departureDetails[4]}`;
+                                                trip.departurecity = unparsedDepartureCity.slice(0, departureDetails[4].lastIndexOf(','));
+                                                trip.departurestate = `${departureDetails[4]}`;
                                                 // where price appears depends on availability of reserved seats.
                                                 // reserved seats' fare descriptions will start with 'From'
                                                 let priceInfoArr = eliminateWhiteSpace($('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`).text());
                                                 priceInfoArr[0] === 'From' ?
-                                                    departure.price = priceInfoArr[1] : departure.price = priceInfoArr[0];
-                                                let tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
-                                                    departure.duration = tripDuration;
-                                                // additional processing to get rid of leading ',' character in location
-                                                departure.pickuplocation = unparsedDepartureLocation.slice(1).join(' ');
+                                                    trip.price = priceInfoArr[1] : departure.price = priceInfoArr[0];
 
-                                                departures.push(departure);
+                                                // additional processing to get rid of leading ',' character in location
+                                                trip.departurelocation = unparsedDepartureLocation.slice(1).join(' ');
+                                                let tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
+                                                    trip.duration = tripDuration;
+
+                                                // ARRIVALS
+                                                let arrival = $('.arrive', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text();
+                                                let arrivalArr = eliminateWhiteSpace(arrival);
+                                                 trip.arrivaltime = `${arrivalArr[1]} ${arrivalArr[2]}`;
+                                                 trip.arrivalcity = `${arrivalArr[3].slice(0, arrivalArr[3].lastIndexOf(','))}`;
+                                                 trip.arrivalstate = `${arrivalArr[4]}`;
+                                                 trip.arrivallocation =`${arrivalArr.slice(arrivalArr.indexOf(',') + 1).join(' ')}`;
+
+                                                trips.push(trip);
                                             }
                                             i++;
                                         }
-    console.log(departures); // left off here 6/19, 2254
+    console.log(trips); // left off here 6/26, 0039
     });
   });
   });

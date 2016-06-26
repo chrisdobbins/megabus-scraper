@@ -90,12 +90,12 @@ function parseTripInfo(tripInfo) {
           // ARRIVALS
           let arrival = $('.arrive', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text();
           let arrivalArr = eliminateWhiteSpace(arrival);
-          let arrivalLocation = arrivalArr[2].split(', ');
+          let arrivalCityState = arrivalArr[2].split(', ');
            trip.arrivaltime = arrivalArr[1];
-           trip.arrivalcity = arrivalLocation[0]; //.slice(0, arrivalArr[3].lastIndexOf(','))}`;
-           trip.arrivalstate = arrivalLocation[1];
-           trip.arrivallocation =`${arrivalArr.slice(arrivalArr.indexOf(',') + 1).join(' ')}`;
-          trips.push(trip);
+           trip.arrivalcity = arrivalCityState[0];
+           trip.arrivalstate = arrivalCityState[1];
+           trip.arrivallocation = arrivalArr[4];
+           trips.push(trip);
       }
       i++;
   }

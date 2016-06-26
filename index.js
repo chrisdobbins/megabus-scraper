@@ -22,18 +22,11 @@ function main() {
             // gets the destinations available for the desired origin
             getAvailableDestinations(originCity, allOrigins).
             then(availableDestinations => {
-                let testDestination = '';
-                // test block for functionality to pass in destination name
-                // TODO: refactor this
-                availableDestinations.destinations.forEach((destination) => {
-                    if (destination.city === destinationCity) {
-                        testDestination = destination;
-                    }
-                    return;
-                });
-                let testDepartureDate = outboundDepartureDate;
-                let testOrigin = availableDestinations.origin;
-                getTripInfo(testOrigin, testDestination, testDepartureDate)
+                let testDestination = verifyDestinationInput(availableDestinations, destinationCity);
+
+                let departureDate = outboundDepartureDate;
+                let origin = availableDestinations.origin;
+                getTripInfo(origin, testDestination, departureDate)
                     .then(tripInfo => {
                       // TODO: Refactor this block into fn called parseTripInfo
                       let trips = parseTripInfo(tripInfo);
@@ -41,6 +34,23 @@ function main() {
                     });
             });
         });
+}
+
+function verifyDestinationInput(availableDestinations, destinationInput) {
+  let verifiedDestination = null;
+  availableDestinations.destinations.forEach((destination) => {
+      if (destination.city === destinationInput) {
+          verifiedDestination = destination;
+      }
+      return;
+  });
+  if (!verifiedDestination) {
+    console.error(`invalid destination. valid destinations are: ${availableDestinations.destinations}`);
+    return
+  }
+  else {
+    return verifiedDestination;
+  }
 }
 
 function parseTripInfo(tripInfo) {
@@ -55,29 +65,34 @@ function parseTripInfo(tripInfo) {
       if ($(gridLineId).children().eq(0).text()) {
         // TODO: DRY this up
           let departureDetails = eliminateWhiteSpace($(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text());
-          let unparsedDepartureLocation = departureDetails.slice(5);
-          let unparsedDepartureCity = departureDetails[3];
-          trip.departuretime = `${departureDetails[1]} ${departureDetails[2]}`;
+          let departureCityState = departureDetails[2].split(', ');
+          let departureCity = departureCityState[0];
+          let departureState = departureCityState[1];
+          let departureLocation = departureDetails[4];
+          trip.departuretime = departureDetails[1];
           // add'l procesing to get rid of trailing ',' character in city
-          trip.departurecity = unparsedDepartureCity.slice(0, departureDetails[4].lastIndexOf(','));
-          trip.departurestate = `${departureDetails[4]}`;
+          trip.departurecity = departureCity; //.slice(0, departureDetails[4].lastIndexOf(',')-3);
+          trip.departurestate = departureState;
+          trip.departurelocation = departureLocation;
           // where price appears depends on availability of reserved seats.
           // reserved seats' fare descriptions will start with 'From'
           let priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
+
           priceInfoArr[0] === 'From' ?
-              trip.price = priceInfoArr[1] : departure.price = priceInfoArr[0];
+              trip.price = priceInfoArr[1] : trip.price = priceInfoArr[0];
 
           // additional processing to get rid of leading ',' character in location
-          trip.departurelocation = unparsedDepartureLocation.slice(1).join(' ');
+        //  trip.departurelocation = unparsedDepartureLocation.slice(1).join(' ');
           let tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
               trip.duration = tripDuration;
 
           // ARRIVALS
           let arrival = $('.arrive', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text();
           let arrivalArr = eliminateWhiteSpace(arrival);
-           trip.arrivaltime = `${arrivalArr[1]} ${arrivalArr[2]}`;
-           trip.arrivalcity = `${arrivalArr[3].slice(0, arrivalArr[3].lastIndexOf(','))}`;
-           trip.arrivalstate = `${arrivalArr[4]}`;
+          let arrivalLocation = arrivalArr[2].split(', ');
+           trip.arrivaltime = arrivalArr[1];
+           trip.arrivalcity = arrivalLocation[0]; //.slice(0, arrivalArr[3].lastIndexOf(','))}`;
+           trip.arrivalstate = arrivalLocation[1];
            trip.arrivallocation =`${arrivalArr.slice(arrivalArr.indexOf(',') + 1).join(' ')}`;
           trips.push(trip);
       }
@@ -86,7 +101,7 @@ function parseTripInfo(tripInfo) {
   return trips;
 }
 function eliminateWhiteSpace(text) {
-  return text.trim().split(/[\s]+/);
+  return text.trim().split(/\s\s+/g);
 }
 
 function getTripInfo(origin, destination, departureDate) {

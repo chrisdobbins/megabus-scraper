@@ -23,7 +23,6 @@ function main() {
             getAvailableDestinations(originCity, allOrigins).
             then(availableDestinations => {
                 let testDestination = verifyDestinationInput(availableDestinations, destinationCity);
-
                 let departureDate = outboundDepartureDate;
                 let origin = availableDestinations.origin;
                 getTripInfo(origin, testDestination, departureDate)
@@ -37,19 +36,21 @@ function main() {
 }
 
 function verifyDestinationInput(availableDestinations, destinationInput) {
-  let verifiedDestination = null;
+  let verifiedDestination = null,
+      validDestinationCities = availableDestinations.destinations.map(destination => { return ' ' + destination.city });
   availableDestinations.destinations.forEach((destination) => {
       if (destination.city === destinationInput) {
           verifiedDestination = destination;
       }
       return;
   });
-  if (!verifiedDestination) {
-    console.error(`invalid destination. valid destinations are: ${availableDestinations.destinations}`);
-    return
+
+  if (verifiedDestination) {
+    return verifiedDestination;
   }
   else {
-    return verifiedDestination;
+    console.error(`invalid destination. valid destinations are:${validDestinationCities}`);
+    return;
   }
 }
 

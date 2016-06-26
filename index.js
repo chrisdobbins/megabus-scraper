@@ -43,26 +43,26 @@ function main() {
                                         while ($(gridLineId).children().eq(0).text()) {
                                             gridNum = (i < 10) ? `l0${i}` : `l${i}`;
                                             gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-
-                                            // departure time below
-                                            let ampmFlag = $(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[3];
                                             // console.log(`${$(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().split(/[\s]+/)[2]} ${ampmFlag}`);
                                             let departure = {};
                                             if ($(gridLineId).children().eq(0).text()) {
-                                                let departureDetails = $(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text().trim().split(/[\s]+/);
+                                                let departureDetails = eliminateWhiteSpace($(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text());
                                                 let unparsedDepartureLocation = departureDetails.slice(5);
                                                 let unparsedDepartureCity = departureDetails[3];
                                                 departure.time = `${departureDetails[1]} ${departureDetails[2]}`;
                                                 // add'l procesing to get rid of trailing ',' character in city
                                                 departure.city = unparsedDepartureCity.slice(0, departureDetails[4].lastIndexOf(','));
                                                 departure.state = `${departureDetails[4]}`;
-                                                // additional processing to get rid of leading ',' character in location
-                                                departure.location = unparsedDepartureLocation.slice(1).join(' ');
                                                 // where price appears depends on availability of reserved seats.
                                                 // reserved seats' fare descriptions will start with 'From'
-                                                let priceInfoArr = $('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`).text().trim().split(/[\s]+/);
+                                                let priceInfoArr = eliminateWhiteSpace($('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`).text());
                                                 priceInfoArr[0] === 'From' ?
                                                     departure.price = priceInfoArr[1] : departure.price = priceInfoArr[0];
+                                                let tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
+                                                    departure.duration = tripDuration;
+                                                // additional processing to get rid of leading ',' character in location
+                                                departure.pickuplocation = unparsedDepartureLocation.slice(1).join(' ');
+
                                                 departures.push(departure);
                                             }
                                             i++;
@@ -71,6 +71,9 @@ function main() {
     });
   });
   });
+}
+function eliminateWhiteSpace(text) {
+  return text.trim().split(/[\s]+/);
 }
 
 function getTripInfo(origin, destination, departureDate) {

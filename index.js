@@ -170,7 +170,6 @@ function mapOriginIds(data) {
       city: originElements.eq(i).text(),
       id: originElements.eq(i).attr('value')
     };
-    // console.log(`${origins.eq(i).text()}: ${origins.eq(i).attr('value')}`);
     origins.push(origin);
   }
   return origins;
@@ -178,5 +177,3 @@ function mapOriginIds(data) {
 
 
 main();
-
-//  $(`.arrive`, `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text().trim().split(/[\s]+/)

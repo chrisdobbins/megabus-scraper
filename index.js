@@ -65,11 +65,11 @@ function parseTripInfo(tripInfo) {
       if ($(gridLineId).children().eq(0).text()) {
         // TODO: DRY this up
           let departureDetails = eliminateWhiteSpace($(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text());
-          let departureCityState = departureDetails[2].split(', ');
-          trip.departuretime = departureDetails[1];
-          trip.departurecity = departureCityState[0];
-          trip.departurestate = departureCityState[1];
-          trip.departurelocation = departureDetails[4];
+          let departure = processDetails(departureDetails);
+          trip.departuretime = departure.time;
+          trip.departurecity = departure.city;
+          trip.departurestate = departure.state;
+          trip.departurelocation = departure.location;
           // where price appears depends on availability of reserved seats.
           // reserved seats' fare descriptions will start with 'From'
           let priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
@@ -81,17 +81,27 @@ function parseTripInfo(tripInfo) {
 
           // ARRIVALS
           let arrivalDetails =  eliminateWhiteSpace($('.arrive', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text());
-          let arrivalCityState = arrivalDetails[2].split(', ');
-          trip.arrivaltime = arrivalDetails[1];
-          trip.arrivalcity = arrivalCityState[0];
-          trip.arrivalstate = arrivalCityState[1];
-          trip.arrivallocation = arrivalDetails[4];
+          let arrival = processDetails(arrivalDetails);
+          trip.arrivalcity = arrival.city;
+          trip.arrivalstate = arrival.state;
+          trip.arrivallocation = arrival.location;
           trips.push(trip);
       }
       i++;
   }
   return trips;
 }
+
+function processDetails(details) {
+    let trip = {};
+    let cityState = details[2].split(', ');
+    trip.time = details[1];
+    trip.city = cityState[0];
+    trip.state = cityState[1];
+    trip.location = details[4];
+    return trip;
+}
+
 function eliminateWhiteSpace(text) {
   return text.trim().split(/\s\s+/g);
 }

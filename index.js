@@ -52,13 +52,12 @@ function main() {
                                                 let unparsedDepartureLocation = departureDetails.slice(5);
                                                 let unparsedDepartureCity = departureDetails[3];
                                                 departure.time = `${departureDetails[1]} ${departureDetails[2]}`;
+                                                // add'l procesing to get rid of trailing ',' character in city
                                                 departure.city = unparsedDepartureCity.slice(0, departureDetails[4].lastIndexOf(','));
                                                 departure.state = `${departureDetails[4]}`;
-                                                // additional processing needed to get rid of leading ',' character in location
+                                                // additional processing to get rid of leading ',' character in location
                                                 departure.location = unparsedDepartureLocation.slice(1).join(' ');
                                                 departure.price = $(gridLineId).children().eq(0).text().split(/[\s]+/)[2];
-
-                                                //console.log($(gridLineId).children().eq(0).text().split(/[\s]+/)[3]);
                                                 departures.push(departure);
          }
          i++;

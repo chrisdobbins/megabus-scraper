@@ -34,6 +34,7 @@ function main() {
                             let testOrigin = availableDestinations.origin;
                             getTripInfo(testOrigin, testDestination, testDepartureDate)
                                 .then(tripInfo => {
+                                  // TODO: Refactor this block into fn called parseTripInfo
                                         let $ = cheerio.load(tripInfo);
                                         let i = 0;
                                         let gridNum = 'l00';

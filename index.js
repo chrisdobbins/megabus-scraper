@@ -82,6 +82,7 @@ function parseTripInfo(tripInfo) {
           // ARRIVALS
           let arrivalDetails =  eliminateWhiteSpace($('.arrive', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text());
           let arrival = processDetails(arrivalDetails);
+          trip.arrivaltime = arrival.time;
           trip.arrivalcity = arrival.city;
           trip.arrivalstate = arrival.state;
           trip.arrivallocation = arrival.location;

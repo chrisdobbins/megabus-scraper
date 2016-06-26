@@ -67,18 +67,14 @@ function parseTripInfo(tripInfo) {
         // TODO: DRY this up
           let departureDetails = eliminateWhiteSpace($(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text());
           let departureCityState = departureDetails[2].split(', ');
-          let departureCity = departureCityState[0];
-          let departureState = departureCityState[1];
-          let departureLocation = departureDetails[4];
           trip.departuretime = departureDetails[1];
           // add'l procesing to get rid of trailing ',' character in city
-          trip.departurecity = departureCity; //.slice(0, departureDetails[4].lastIndexOf(',')-3);
-          trip.departurestate = departureState;
-          trip.departurelocation = departureLocation;
+          trip.departurecity = departureCityState[0];
+          trip.departurestate = departureCityState[1];
+          trip.departurelocation = departureDetails[4];
           // where price appears depends on availability of reserved seats.
           // reserved seats' fare descriptions will start with 'From'
           let priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
-
           priceInfoArr[0] === 'From' ?
               trip.price = priceInfoArr[1] : trip.price = priceInfoArr[0];
 
@@ -88,13 +84,12 @@ function parseTripInfo(tripInfo) {
               trip.duration = tripDuration;
 
           // ARRIVALS
-          let arrival = $('.arrive', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text();
-          let arrivalArr = eliminateWhiteSpace(arrival);
-          let arrivalCityState = arrivalArr[2].split(', ');
-           trip.arrivaltime = arrivalArr[1];
+          let arrivalDetails =  eliminateWhiteSpace($('.arrive', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text());
+          let arrivalCityState = arrivalDetails[2].split(', ');
+           trip.arrivaltime = arrivalDetails[1];
            trip.arrivalcity = arrivalCityState[0];
            trip.arrivalstate = arrivalCityState[1];
-           trip.arrivallocation = arrivalArr[4];
+           trip.arrivallocation = arrivalDetails[4];
            trips.push(trip);
       }
       i++;

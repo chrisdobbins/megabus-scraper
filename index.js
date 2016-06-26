@@ -1,14 +1,13 @@
 'use strict';
 const requestPromise = require('request-promise'),
     cheerio = require('cheerio'),
-    fs = require('fs');
-
-let mainPageOptions = {
-    uri: 'http://us.megabus.com/Default.aspx',
-    headers: {
+    fs = require('fs'),
+    mainPageOptions = {
+      uri: 'http://us.megabus.com/Default.aspx',
+      headers: {
         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:42.0) Gecko/20100101 Firefox/42.0'
-    }
-};
+      }
+   };
 
 function main() {
     requestPromise(mainPageOptions) // crawls home page to get origin IDs

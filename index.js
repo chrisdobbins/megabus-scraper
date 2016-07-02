@@ -20,17 +20,17 @@ function main() {
 
             // gets the destinations available for the desired origin
             getAvailableDestinations(originCity, allOrigins).
-            then(availableDestinations => {
-                let destination = verifyDestinationInput(availableDestinations, destinationCity);
-                let departureDate = outboundDepartureDate;
-                let origin = availableDestinations.origin;
-                getTripInfo(origin, destination, departureDate)
-                    .then(tripInfo => {
-                      let trips = parseTripInfo(tripInfo);
-                      console.log(trips); // left off here 6/26, 0101
+                then(availableDestinations => {
+                    let destination = verifyDestinationInput(availableDestinations, destinationCity);
+                    let departureDate = outboundDepartureDate;
+                    let origin = availableDestinations.origin;
+                    getTripInfo(origin, destination, departureDate)
+                        .then(tripInfo => {
+                          let trips = parseTripInfo(tripInfo);
+                          console.log(trips); // left off here 6/26, 0101
+                    });
                 });
-            });
-        });
+    });
 }
 
 function verifyDestinationInput(availableDestinations, destinationInput) {

@@ -97,10 +97,8 @@ function parseTripInfo(tripInfo, direction) {
             let priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
             priceInfoArr[0] === 'From' ?
                 trip.price = priceInfoArr[1] : trip.price = priceInfoArr[0];
-
             let tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
             trip.duration = tripDuration;
-
             // ARRIVALS
             let arrivalDetails = eliminateWhiteSpace($('.arrive', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).text());
             let arrival = processDetails(arrivalDetails);

@@ -16,9 +16,8 @@ function main() {
             // need to sanitize input rather than blindly trusting.
             const originCity = process.argv[2];
             const destinationCity = process.argv[3];
-            const outboundDepartureDate = process.argv[4];
-            const inboundDepartureDate = process.argv[5];
-
+            const outboundDepartureDate = sanitizeDate(process.argv[4]);
+            const inboundDepartureDate = sanitizeDate(process.argv[5]);
 
             // gets the destinations available for the desired origin
             getAvailableDestinations(originCity, allOrigins).
@@ -31,15 +30,25 @@ function main() {
                           if (inboundDepartureDate) {
                               let inboundTrips = parseTripInfo(tripInfo, 'Inbound');
                               let outboundTrips = parseTripInfo(tripInfo, 'Outbound');
-                              console.log('outbound: ', outboundTrips);
-                              console.log('inbound: ', inboundTrips);
+                              let allTrips = {outbound: outboundTrips,
+                                              inbound: inboundTrips};
+                              console.log(JSON.stringify(allTrips, null, 2));
                           }
-
-
-                        //  console.log(trips); // left off here 6/26, 0101
                     });
                 });
     });
+}
+
+function sanitizeDate(dateString) {
+  let dirtyDate = new Date(dateString);
+  const options = {year: 'numeric', day: '2-digit', month: '2-digit'};
+  try {
+    let cleanDate = dirtyDate.toLocaleDateString('en-US', options);
+    return cleanDate
+  } catch(e) {
+    return e;
+  }
+
 }
 
 function verifyDestinationInput(availableDestinations, destinationInput) {
@@ -57,57 +66,6 @@ function verifyDestinationInput(availableDestinations, destinationInput) {
     return;
   }
   return verifiedDestination;
-}
-
-function processOutboundTrips(tripInfo) {
-  let $ = cheerio.load(tripInfo),
-      i = 0,
-      gridNum = 'l00',
-      trips = [];
-      while ($(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`).children().eq(0).text()) {
-          gridNum = (i < 10) ? `l0${i}` : `l${i}`;
-          let gridLineId = `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.five`;
-          let trip = {};
-          if ($(gridLineId).children().eq(0).text()) {
-            // TODO: DRY this up
-              let departureDetails = eliminateWhiteSpace($(`#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text());
-              let departure = processDetails(departureDetails);
-              trip.departuretime = departure.time;
-              trip.departurecity = departure.city;
-              trip.departurestate = departure.state;
-              trip.departurelocation = departure.location;
-              // where price appears depends on availability of reserved seats.
-              // reserved seats' fare descriptions will start with 'From'
-              let priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
-              priceInfoArr[0] === 'From' ?
-                  trip.price = priceInfoArr[1] : trip.price = priceInfoArr[0];
-
-              let tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
-              trip.duration = tripDuration;
-
-              // ARRIVALS
-              let arrivalDetails =  eliminateWhiteSpace($('.arrive', `#JourneyResylts_OutboundList_GridViewResults_ct${gridNum}_row_item li.two`).text());
-              let arrival = processDetails(arrivalDetails);
-              trip.arrivaltime = arrival.time;
-              trip.arrivalcity = arrival.city;
-              trip.arrivalstate = arrival.state;
-              trip.arrivallocation = arrival.location;
-              trips.push(trip);
-          }
-          i++;
-      }
-      return trips;
-}
-
-function processInboundTrips(tripInfo) {
-  const $ = cheerio.load(tripInfo);
-  let gridNumStub = 'ctl',
-      i = 0,
-      gridNum = ((i < 10) ? `${gridNumStub}0${i}` : `${gridNumStub}${i}`);
-  let data = $(`#JourneyResylts_InboundList_GridViewResults_${gridNum}_row_item`).text();
-
-  console.log(data);
-
 }
 
 function parseTripInfo(tripInfo, direction) {

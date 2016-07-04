@@ -1,17 +1,18 @@
 'use strict';
 // crawls home page to get origin IDs
 const requestPromise = require('request-promise'),
-      cheerio = require('cheerio');
+    cheerio = require('cheerio');
+
 function getAllOriginIds() {
-  const mainPageOptions = {
-      uri: 'http://us.megabus.com/Default.aspx',
-      headers: {
-          'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:42.0) Gecko/20100101 Firefox/42.0'
-      }
-  };
-  return requestPromise(mainPageOptions).then(homePageData => {
-      return mapOriginIds(homePageData);
-  });
+    const mainPageOptions = {
+        uri: 'http://us.megabus.com/Default.aspx',
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:42.0) Gecko/20100101 Firefox/42.0'
+        }
+    };
+    return requestPromise(mainPageOptions).then(homePageData => {
+        return mapOriginIds(homePageData);
+    });
 }
 
 function mapOriginIds(data) {

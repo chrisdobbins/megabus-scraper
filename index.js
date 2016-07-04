@@ -2,40 +2,31 @@
 const requestPromise = require('request-promise'),
     cheerio = require('cheerio'),
     fs = require('fs'),
-    mainPageOptions = {
-        uri: 'http://us.megabus.com/Default.aspx',
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:42.0) Gecko/20100101 Firefox/42.0'
-        }
-    };
+    getAllOriginIds = require('./get-all-origins.js'),
+    getAvailableDestinations = require('./get-available-destinations.js');
 
 function main() {
-    requestPromise(mainPageOptions). // crawls home page to get origin IDs
-    then(homePage => {
-        const allOrigins = mapOriginIds(homePage); //creates array of city name and id objs
+    getAllOriginIds().then( allOrigins => {
         // need to sanitize input rather than blindly trusting.
         const originCity = process.argv[2];
         const destinationCity = process.argv[3];
-        const outboundDepartureDate = sanitizeDate(process.argv[4]);
-        const inboundDepartureDate = sanitizeDate(process.argv[5]);
+        // const outboundDepartureDate =
+
 
         // gets the destinations available for the desired origin
         getAvailableDestinations(originCity, allOrigins).
         then(availableDestinations => {
-            let destination = verifyDestinationInput(availableDestinations, destinationCity);
-            let departureDate = outboundDepartureDate;
-            let origin = availableDestinations.origin;
+            const destination = verifyDestinationInput(availableDestinations, destinationCity),
+                  origin = availableDestinations.origin,
+                  inboundDepartureDate = sanitizeDate(process.argv[5]),
+                  outboundDepartureDate = sanitizeDate(process.argv[4]);
             getTripInfo(origin, destination, outboundDepartureDate, inboundDepartureDate).
             then(tripInfo => {
-                if (inboundDepartureDate) {
-                    let inboundTrips = parseTripInfo(tripInfo, 'Inbound');
-                    let outboundTrips = parseTripInfo(tripInfo, 'Outbound');
-                    let allTrips = {
-                        outbound: outboundTrips,
-                        inbound: inboundTrips
+                const allTrips = {
+                      outbound: parseTripInfo(tripInfo, 'Outbound'),
+                      inbound: parseTripInfo(tripInfo, 'Inbound')
                     };
                     console.log(JSON.stringify(allTrips, null, 2));
-                }
             });
         });
     });
@@ -49,8 +40,7 @@ function sanitizeDate(dateString) {
         month: '2-digit'
     };
     try {
-        let cleanDate = dirtyDate.toLocaleDateString('en-US', options);
-        return cleanDate
+        return dirtyDate.toLocaleDateString('en-US', options);
     } catch (e) {
         return e;
     }
@@ -76,8 +66,8 @@ function verifyDestinationInput(availableDestinations, destinationInput) {
 }
 
 function parseTripInfo(tripInfo, direction) {
-    let $ = cheerio.load(tripInfo),
-        i = 0,
+    const $ = cheerio.load(tripInfo);
+    let i = 0,
         gridNum = 'l00',
         trips = [];
     while ($(`#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.five`).children().eq(0).text()) {
@@ -86,32 +76,41 @@ function parseTripInfo(tripInfo, direction) {
         let trip = {};
         if ($(gridLineId).children().eq(0).text()) {
             // TODO: DRY this up
-            let departureDetails = eliminateWhiteSpace($(`#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text());
-            let departure = processDetails(departureDetails);
-            trip.departuretime = departure.time;
-            trip.departurecity = departure.city;
-            trip.departurestate = departure.state;
-            trip.departurelocation = departure.location;
-            // where price appears depends on availability of reserved seats.
-            // reserved seats' fare descriptions will start with 'From'
-            let priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
-            priceInfoArr[0] === 'From' ?
-                trip.price = priceInfoArr[1] : trip.price = priceInfoArr[0];
-            let tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
+            const departureDetails = eliminateWhiteSpace($(`#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text()),
+                  departure = processDetails(departureDetails);
+            buildTripObj(departure.time, departure.city, departure.state, departure.location, 'departure', trip);
+
+            // if trip allows seat reservations, fare descriptions will start with 'From'
+            const priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text()),
+                  tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
+
+            getPrice(priceInfoArr, trip);
             trip.duration = tripDuration;
             // ARRIVALS
-            let arrivalDetails = eliminateWhiteSpace($('.arrive', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).text());
-            let arrival = processDetails(arrivalDetails);
-            trip.arrivaltime = arrival.time;
-            trip.arrivalcity = arrival.city;
-            trip.arrivalstate = arrival.state;
-            trip.arrivallocation = arrival.location;
+            const arrivalDetails = eliminateWhiteSpace($('.arrive', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).text()),
+                  arrival = processDetails(arrivalDetails);
+            buildTripObj(arrival.time, arrival.city, arrival.state, arrival.location, 'arrival', trip);
             trips.push(trip);
         }
         i++;
     }
+
+    function buildTripObj(time, city, state, location, tripType, tripObj) {
+      tripObj[`${tripType}city`] = city;
+      tripObj[`${tripType}time`] = time;
+      tripObj[`${tripType}state`] = state;
+      tripObj[`${tripType}location`] = location;
+      return tripObj;
+    }
     return trips;
 }
+
+function getPrice(priceInfoArr, trip) {
+  priceInfoArr[0] === 'From' ?
+      trip.price = priceInfoArr[1] : trip.price = priceInfoArr[0];
+  return trip;
+}
+
 
 function processDetails(details) {
     let trip = {};
@@ -150,58 +149,6 @@ function getTripInfo(origin, destination, outboundDepartureDate, inboundDepartur
         }
     };
     return requestPromise(journeyOptions);
-}
-
-function getAvailableDestinations(originName, allOrigins) {
-    let destinationOptions = {
-            uri: 'http://us.megabus.com/support/journeyplanner.svc/GetDestinations',
-            qs: {
-                originId: null
-            },
-            json: true
-        },
-        allAvailableDestinations = {
-            origin: {},
-            destinations: []
-        };
-
-    allOrigins.forEach(currCity => {
-        if (currCity.city === process.argv[2]) {
-            destinationOptions.qs.originId = parseInt(currCity.id);
-            allAvailableDestinations.origin.id = destinationOptions.qs.originId;
-            allAvailableDestinations.origin.city = currCity.city;
-            return
-        }
-    });
-    if (!destinationOptions.qs.originId) {
-        console.error('invalid origin id; please check the destination name');
-        return;
-    }
-    // promise that will return the names ('descriptionField') and
-    // ids ('idField') of the destinations available for the city (originName)
-    return requestPromise(destinationOptions).then(data => {
-        allAvailableDestinations.destinations = data.d.map(currVal => {
-            let destination = {};
-            destination.city = currVal.descriptionField;
-            destination.id = currVal.idField;
-            return destination;
-        });
-        return allAvailableDestinations;
-    });
-}
-
-function mapOriginIds(data) {
-    let $ = cheerio.load(data);
-    let origins = [];
-    let originElements = $('#JourneyPlanner_ddlOrigin').find('option');
-    for (let i = 1; i < originElements.length; i++) {
-        let origin = {
-            city: originElements.eq(i).text(),
-            id: originElements.eq(i).attr('value')
-        };
-        origins.push(origin);
-    }
-    return origins;
 }
 
 

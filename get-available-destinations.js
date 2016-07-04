@@ -39,5 +39,4 @@ function getAvailableDestinations(originName, allOrigins) {
     });
 }
 
-
 module.exports = getAvailableDestinations;

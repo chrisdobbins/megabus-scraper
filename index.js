@@ -24,7 +24,7 @@
                             trips: parseTripInfo(tripInfo, 'Outbound')
                         },
                         inbound: {
-                            departuredate: inboundDepartureDate,
+                            departuredate: inboundDepartureDate ? inboundDepartureDate : '',
                             trips: parseTripInfo(tripInfo, 'Inbound')
                         }
                     };
@@ -42,9 +42,10 @@
                 month: '2-digit'
             };
         try {
-            return dirtyDate.toLocaleDateString('en-US', options);
+            const cleanDate = dirtyDate.toLocaleDateString('en-US', options);
+            return (cleanDate.split(' ').indexOf('Invalid') === -1 ? cleanDate : '');
         } catch (e) {
-            return e;
+            return '';
         }
     }
 

@@ -16,7 +16,6 @@ function parseTripInfo(tripInfo, direction) {
                 departure = processDetails(departureDetails);
             buildTripObj(departure.time, departure.city, departure.state, departure.location, 'departure', trip);
 
-
             const priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text()),
                 tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
 

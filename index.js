@@ -14,25 +14,22 @@ function main() {
     then(homePage => {
         const allOrigins = mapOriginIds(homePage); //creates array of city name and id objs
         // need to sanitize input rather than blindly trusting.
-        const originCity = process.argv[2];
-        const destinationCity = process.argv[3];
-        const outboundDepartureDate = sanitizeDate(process.argv[4]);
-        const inboundDepartureDate = sanitizeDate(process.argv[5]);
+        const originCity = process.argv[2],
+              destinationCity = process.argv[3],
+              outboundDepartureDate = sanitizeDate(process.argv[4]),
+              inboundDepartureDate = sanitizeDate(process.argv[5]);
 
         // gets the destinations available for the desired origin
         getAvailableDestinations(originCity, allOrigins).
         then(availableDestinations => {
-            let destination = verifyDestinationInput(availableDestinations, destinationCity);
-            let departureDate = outboundDepartureDate;
-            let origin = availableDestinations.origin;
+            const destination = verifyDestinationInput(availableDestinations, destinationCity),
+                  origin = availableDestinations.origin;
             getTripInfo(origin, destination, outboundDepartureDate, inboundDepartureDate).
             then(tripInfo => {
                 if (inboundDepartureDate) {
-                    let inboundTrips = parseTripInfo(tripInfo, 'Inbound');
-                    let outboundTrips = parseTripInfo(tripInfo, 'Outbound');
                     let allTrips = {
-                        outbound: outboundTrips,
-                        inbound: inboundTrips
+                        outbound: parseTripInfo(tripInfo, 'Outbound'),
+                        inbound: parseTripInfo(tripInfo, 'Inbound')
                     };
                     console.log(JSON.stringify(allTrips, null, 2));
                 }
@@ -42,15 +39,14 @@ function main() {
 }
 
 function sanitizeDate(dateString) {
-    let dirtyDate = new Date(dateString);
-    const options = {
-        year: 'numeric',
-        day: '2-digit',
-        month: '2-digit'
-    };
+    const dirtyDate = new Date(dateString),
+          options = {
+             year: 'numeric',
+             day: '2-digit',
+             month: '2-digit'
+          };
     try {
-        let cleanDate = dirtyDate.toLocaleDateString('en-US', options);
-        return cleanDate
+        return dirtyDate.toLocaleDateString('en-US', options);
     } catch (e) {
         return e;
     }
@@ -76,8 +72,8 @@ function verifyDestinationInput(availableDestinations, destinationInput) {
 }
 
 function parseTripInfo(tripInfo, direction) {
-    let $ = cheerio.load(tripInfo),
-        i = 0,
+    const $ = cheerio.load(tripInfo);
+    let i = 0,
         gridNum = 'l00',
         trips = [];
     while ($(`#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.five`).children().eq(0).text()) {
@@ -87,30 +83,31 @@ function parseTripInfo(tripInfo, direction) {
         if ($(gridLineId).children().eq(0).text()) {
             // TODO: DRY this up
             let departureDetails = eliminateWhiteSpace($(`#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text());
-            let departure = processDetails(departureDetails);
-            trip.departuretime = departure.time;
-            trip.departurecity = departure.city;
-            trip.departurestate = departure.state;
-            trip.departurelocation = departure.location;
+            const departure = processDetails(departureDetails);
+            trip = buildTripObj(departure.time, departure.city, departure.state, departure.location, 'departure', trip);
             // where price appears depends on availability of reserved seats.
-            // reserved seats' fare descriptions will start with 'From'
+            // trips that allow seat reservations will have fare descriptions that start with 'From'
             let priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
             priceInfoArr[0] === 'From' ?
                 trip.price = priceInfoArr[1] : trip.price = priceInfoArr[0];
-            let tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
-            trip.duration = tripDuration;
+            trip.duration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
             // ARRIVALS
             let arrivalDetails = eliminateWhiteSpace($('.arrive', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).text());
             let arrival = processDetails(arrivalDetails);
-            trip.arrivaltime = arrival.time;
-            trip.arrivalcity = arrival.city;
-            trip.arrivalstate = arrival.state;
-            trip.arrivallocation = arrival.location;
+            trip = buildTripObj(arrival.time, arrival.city, arrival.state, arrival.location, 'arrival', trip);
             trips.push(trip);
         }
         i++;
     }
     return trips;
+}
+
+function buildTripObj(time, city, state, location, tripType, trip) {
+  trip[`${tripType}time`] = time;
+  trip[`${tripType}city`] = city;
+  trip[`${tripType}state`] = state;
+  trip[`${tripType}location`] = location;
+  return trip;
 }
 
 function processDetails(details) {
@@ -128,7 +125,7 @@ function eliminateWhiteSpace(text) {
 }
 
 function getTripInfo(origin, destination, outboundDepartureDate, inboundDepartureDate) {
-    let journeyOptions = {
+    const journeyOptions = {
         uri: 'http://us.megabus.com/JourneyResults.aspx',
         qs: {
             originCode: origin.id,
@@ -191,9 +188,9 @@ function getAvailableDestinations(originName, allOrigins) {
 }
 
 function mapOriginIds(data) {
-    let $ = cheerio.load(data);
+    const $ = cheerio.load(data),
+          originElements = $('#JourneyPlanner_ddlOrigin').find('option');
     let origins = [];
-    let originElements = $('#JourneyPlanner_ddlOrigin').find('option');
     for (let i = 1; i < originElements.length; i++) {
         let origin = {
             city: originElements.eq(i).text(),

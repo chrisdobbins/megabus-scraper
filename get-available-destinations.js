@@ -1,7 +1,7 @@
 'use strict';
 const requestPromise = require('request-promise');
 
-function getAvailableDestinations(originName, allOrigins) {
+function getAvailableDestinations(originCity, allOrigins) {
     let destinationOptions = {
             uri: 'http://us.megabus.com/support/journeyplanner.svc/GetDestinations',
             qs: {
@@ -15,7 +15,7 @@ function getAvailableDestinations(originName, allOrigins) {
         };
 
     allOrigins.forEach(currCity => {
-        if (currCity.city === process.argv[2]) {
+        if (currCity.city === originCity) {
             destinationOptions.qs.originId = parseInt(currCity.id);
             allAvailableDestinations.origin.id = destinationOptions.qs.originId;
             allAvailableDestinations.origin.city = currCity.city;

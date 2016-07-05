@@ -18,6 +18,7 @@ function parseTripInfo(tripInfo, direction) {
             // PRICE
             const priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
             trip.price = getPrice(priceInfoArr);
+            // DURATION OF THIS LEG
             trip.duration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
             // ARRIVAL
             const arrivalDetails = eliminateWhiteSpace($('.arrive', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).text()),

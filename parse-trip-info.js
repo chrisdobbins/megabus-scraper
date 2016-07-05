@@ -17,7 +17,7 @@ function parseTripInfo(tripInfo, direction) {
             buildTripObj(departure.time, departure.city, departure.state, departure.location, 'departure', trip);
             // PRICE
             const priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text());
-            getPrice(priceInfoArr, trip);
+            trip.price = getPrice(priceInfoArr);
             trip.duration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
             // ARRIVAL
             const arrivalDetails = eliminateWhiteSpace($('.arrive', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).text()),
@@ -37,12 +37,9 @@ function parseTripInfo(tripInfo, direction) {
     return trips;
 }
 
-function getPrice(priceInfoArr, trip) {
+function getPrice(priceInfoArr) {
     // if trip allows seat reservations, fare descriptions will start with 'From'
-    if (priceInfoArr[0] === 'From') {
-      return priceInfoArr[1]
-    }
-    return priceInfoArr[0];
+    return ((priceInfoArr[0] === 'From') ? priceInfoArr[1] : priceInfoArr[0]);
 }
 
 

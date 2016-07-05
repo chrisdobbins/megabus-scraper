@@ -15,7 +15,7 @@
             inboundDeparture = processArgs.sanitizeDate(process.argv[5]),
             outboundDeparture = processArgs.sanitizeDate(process.argv[4]);
         mapOriginToDestinations(origin).then(destinations => {
-            tripInfoForOriginAndDest(destination, outboundDeparture, inboundDeparture, availableDestinations).then(fullTripInfo => {
+            tripInfoForOriginAndDest(destination, destinations, outboundDeparture, inboundDeparture).then(fullTripInfo => {
                 console.log(JSON.stringify(fullTripInfo, null, 2));
             });
         });
@@ -28,16 +28,16 @@
     }
 
     function tripInfoForOriginAndDest(destination, availableDestinations, outboundDeparture, inboundDeparture) {
-        const safeDestination = processArgs.verifyDestinationInput(availableDestinations, destinationCity),
+        const safeDestination = processArgs.verifyDestinationInput(availableDestinations, destination),
             safeOrigin = availableDestinations.origin;
-        return getTripInfo(safeOrigin, safeDestination, outboundDepartureDate, inboundDepartureDate).then(tripInfo => {
+        return getTripInfo(safeOrigin, safeDestination, outboundDeparture, inboundDeparture).then(tripInfo => {
             return {
                 outbound: {
-                    departuredate: outboundDepartureDate,
+                    departuredate: outboundDeparture,
                     trips: parseTripInfo(tripInfo, 'Outbound')
                 },
                 inbound: {
-                    departuredate: inboundDepartureDate ? inboundDepartureDate : '',
+                    departuredate: inboundDeparture ? inboundDeparture : '',
                     trips: parseTripInfo(tripInfo, 'Inbound')
                 }
             };

@@ -8,7 +8,7 @@ function parseTripInfo(tripInfo, direction) {
         trips = [];
     while ($(`#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.five`).children().eq(0).text()) {
         gridNum = (i < 10) ? `l0${i}` : `l${i}`;
-        let gridLineId = `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.five`;
+        const gridLineId = `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.five`;
         let trip = {};
         if ($(gridLineId).children().eq(0).text()) {
             // DEPARTURE
@@ -39,8 +39,10 @@ function parseTripInfo(tripInfo, direction) {
 
 function getPrice(priceInfoArr, trip) {
     // if trip allows seat reservations, fare descriptions will start with 'From'
-    priceInfoArr[0] === 'From' ?
-        trip.price = priceInfoArr[1] : trip.price = priceInfoArr[0];
+    if (priceInfoArr[0] === 'From') {
+      return priceInfoArr[1]
+    }
+    return priceInfoArr[0];
 }
 
 

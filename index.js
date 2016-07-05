@@ -37,7 +37,7 @@
                     trips: parseTripInfo(tripInfo, 'Outbound')
                 },
                 inbound: {
-                    departuredate: inboundDeparture ? inboundDeparture : '',
+                    departuredate: (inboundDeparture) ? inboundDeparture : '',
                     trips: parseTripInfo(tripInfo, 'Inbound')
                 }
             };

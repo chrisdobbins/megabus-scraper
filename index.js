@@ -4,17 +4,20 @@
         getAllOriginIds = require('./get-all-origins.js'),
         getAvailableDestinations = require('./get-available-destinations.js'),
         getTripInfo = require('./get-trip-info.js'),
-        parseTripInfo = require('./parse-trip-info.js');
+        parseTripInfo = require('./parse-trip-info.js'),
+        processArgs = require('./process-args.js');
 
     function main() {
+      // TODO: add logic to sanitize city input and check that there is always
+      // an outbound city and date
         const originCity = process.argv[2],
             destinationCity = process.argv[3],
-            inboundDepartureDate = sanitizeDate(process.argv[5]),
-            outboundDepartureDate = sanitizeDate(process.argv[4])
+            inboundDepartureDate = processArgs.sanitizeDate(process.argv[5]),
+            outboundDepartureDate = processArgs.sanitizeDate(process.argv[4]);
         getAllOriginIds().then(allOrigins => {
             getAvailableDestinations(originCity, allOrigins).
             then(availableDestinations => {
-                const destination = verifyDestinationInput(availableDestinations, destinationCity),
+                const destination = processArgs.verifyDestinationInput(availableDestinations, destinationCity),
                     origin = availableDestinations.origin;
                 getTripInfo(origin, destination, outboundDepartureDate, inboundDepartureDate).
                 then(tripInfo => {
@@ -34,38 +37,7 @@
         });
     }
 
-    function sanitizeDate(dateString) {
-        const dirtyDate = new Date(dateString),
-            options = {
-                year: 'numeric',
-                day: '2-digit',
-                month: '2-digit'
-            };
-        try {
-            const cleanDate = dirtyDate.toLocaleDateString('en-US', options);
-            return (cleanDate.split(' ').indexOf('Invalid') === -1 ? cleanDate : '');
-        } catch (e) {
-            return '';
-        }
-    }
 
-    function verifyDestinationInput(availableDestinations, destinationInput) {
-        let verifiedDestination = null,
-            validDestinationCities = availableDestinations.destinations.map(destination => {
-                return ` ${destination.city}`;
-            });
-        availableDestinations.destinations.forEach((destination) => {
-            if (destination.city === destinationInput) {
-                verifiedDestination = destination;
-            }
-            return;
-        });
-
-        if (!verifiedDestination) {
-            console.error(`invalid destination. valid destinations are:${validDestinationCities}`);
-            return;
-        }
-        return verifiedDestination;
-    }
     main();
+
 })();

@@ -11,19 +11,17 @@ function parseTripInfo(tripInfo, direction) {
         let gridLineId = `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.five`;
         let trip = {};
         if ($(gridLineId).children().eq(0).text()) {
-            // DEPARTURES
+            // DEPARTURE
             const departureDetails = eliminateWhiteSpace($(`#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).children().eq(0).text()),
                 departure = processDetails(departureDetails);
             buildTripObj(departure.time, departure.city, departure.state, departure.location, 'departure', trip);
-
+            // PRICE
             const priceInfoArr = eliminateWhiteSpace($('p', gridLineId).text()),
-                tripDuration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
-
             getPrice(priceInfoArr, trip);
-            trip.duration = tripDuration;
-            // ARRIVALS
+            trip.duration = eliminateWhiteSpace($('p', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.three`).text()).join(' ');
+            // ARRIVAL
             const arrivalDetails = eliminateWhiteSpace($('.arrive', `#JourneyResylts_${direction}List_GridViewResults_ct${gridNum}_row_item li.two`).text()),
-                arrival = processDetails(arrivalDetails);
+                  arrival = processDetails(arrivalDetails);
             buildTripObj(arrival.time, arrival.city, arrival.state, arrival.location, 'arrival', trip);
             trips.push(trip);
         }

@@ -14,7 +14,6 @@
             destination = process.argv[3],
             inboundDeparture = processArgs.sanitizeDate(process.argv[5]),
             outboundDeparture = processArgs.sanitizeDate(process.argv[4]);
-
         mapOriginToDestinations(origin).then(destinations => {
             tripInfoForOriginAndDest(destination, outboundDeparture, inboundDeparture, availableDestinations).then(fullTripInfo => {
                 console.log(JSON.stringify(fullTripInfo, null, 2));

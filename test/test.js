@@ -8,6 +8,7 @@ const char = require('chai'),
     parseTripInfo = require('../parse-trip-info'),
     chaiAsPromised = require('chai-as-promised'),
     should = require('should'),
+    processArgs = require('../process-args'),
     cities = [{
         city: 'Albany, NY',
         id: '89'
@@ -409,5 +410,20 @@ describe('get all origins', (done) => {
 describe('get available destinations for an individual city', (done) => {
     it('should return all available destination cities for an individual city', () => {
         getAvailableDestinations('Atlanta, GA', cities).should.eventually.deepEqual(testOrigin);
+    });
+});
+describe('process arguments', (done) => {
+    describe('sanitize date', (done) => {
+        it('should return a date in "mm/dd/yyyy" format when given a valid date', () => {
+            processArgs.sanitizeDate('7-2-16').should.equal('07/02/2016');
+        });
+        it('should return an empty string when given an invalid date', () => {
+            processArgs.sanitizeDate('1-72-43').should.equal('');
+        })
+    });
+    describe('verify destination input', (done) => {
+        it('should return an object with the destination when passed a valid destination', () => {
+            processArgs.verifyDestinationInput(testOrigin, 'Memphis, TN').should.deepEqual({city: 'Memphis, TN', id: '120'});
+        });
     });
 });

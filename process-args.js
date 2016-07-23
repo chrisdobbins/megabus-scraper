@@ -6,13 +6,9 @@ function sanitizeDate(dateString) {
             year: 'numeric',
             day: '2-digit',
             month: '2-digit'
-        };
-    try {
-        const cleanDate = dirtyDate.toLocaleDateString('en-US', options);
-        return (cleanDate.split(' ').indexOf('Invalid') === -1 ? cleanDate : '');
-    } catch (e) {
-        return '';
-    }
+        },
+        cleanDate = dirtyDate.toLocaleDateString('en-US', options);
+    return (cleanDate.split(' ').indexOf('Invalid') === -1 ? cleanDate : '');
 }
 
 function verifyDestinationInput(availableDestinations, destinationInput) {

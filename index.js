@@ -30,6 +30,7 @@
     function tripInfoForOriginAndDest(destination, availableDestinations, outboundDeparture, inboundDeparture) {
         const safeDestination = processArgs.verifyDestinationInput(availableDestinations, destination),
             safeOrigin = availableDestinations.origin;
+        console.log(safeDestination);
         return getTripInfo(safeOrigin, safeDestination, outboundDeparture, inboundDeparture).then(tripInfo => {
             return {
                 outbound: {

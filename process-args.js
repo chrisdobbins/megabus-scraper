@@ -24,8 +24,8 @@ function verifyDestinationInput(availableDestinations, destinationInput) {
     });
 
     if (!verifiedDestination) {
-        console.error(`invalid destination. valid destinations are:${validDestinationCities}`);
-        return;
+        // console.error(`invalid destination. valid destinations are:${validDestinationCities}`);
+        return new Error(`invalid destination. valid destinations are:${validDestinationCities}`);
     }
     return verifiedDestination;
 }

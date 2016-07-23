@@ -422,8 +422,16 @@ describe('process arguments', (done) => {
         })
     });
     describe('verify destination input', (done) => {
+        let testDestinations;
         it('should return an object with the destination when passed a valid destination', () => {
             processArgs.verifyDestinationInput(testOrigin, 'Memphis, TN').should.deepEqual({city: 'Memphis, TN', id: '120'});
+        });
+        before(() => {
+            testDestinations = processArgs.verifyDestinationInput(testOrigin, 'Sacramento, CA');
+        });
+        it('should throw an error listing valid destinations when passed an invalid destination', () => {
+            testDestinations.should.be.an.instanceof(Error);
+            testDestinations.message.should.equal(`invalid destination. valid destinations are: Athens, GA, Baltimore, MD, Birmingham, AL, Charlotte, NC, Chattanooga, TN, Chicago, IL, Christiansburg, VA, Columbia, SC, Dallas/Fort Worth, TX, Durham, NC, Fayetteville, NC, Fort Lauderdale, FL, Gainesville, FL, Indianapolis, IN, Jacksonville, FL, Knoxville, TN, Louisville, KY, Memphis, TN, Miami, FL, Mobile, AL, Montgomery, AL, Nashville, TN, New Orleans, LA, New York, NY, Newark, DE, Orlando, FL, Philadelphia, PA, Richmond, VA, Tampa, FL, Tampa\\Mango (P&R), FL, Washington, DC`);
         });
     });
 });

@@ -2,10 +2,10 @@
 
 const char = require('chai'),
     assert = require('chai').assert,
-    getAllOrigins = require('../get-all-origins.js'),
-    getAvailableDestinations = require('../get-available-destinations.js'),
-    getTripInfo = require('../get-trip-info.js'),
-    parseTripInfo = require('../parse-trip-info.js'),
+    getAllOrigins = require('../get-all-origins'),
+    getAvailableDestinations = require('../get-available-destinations'),
+    getTripInfo = require('../get-trip-info'),
+    parseTripInfo = require('../parse-trip-info'),
     chaiAsPromised = require('chai-as-promised'),
     should = require('should'),
     cities = [{
@@ -299,11 +299,118 @@ const char = require('chai'),
     }, {
         city: 'Washington, DC',
         id: '142'
-    }];
+    }],
+    testOrigin = {
+        origin: {
+            id: 289,
+            city: 'Atlanta,GA'
+        },
+        destinations: [{
+            city: 'Athens, GA',
+            id: '302'
+        }, {
+            city: 'Baltimore, MD',
+            id: '143'
+        }, {
+            city: 'Birmingham, AL',
+            id: '292'
+        }, {
+            city: 'Charlotte, NC',
+            id: '99'
+        }, {
+            city: 'Chattanooga, TN',
+            id: '290'
+        }, {
+            city: 'Chicago, IL',
+            id: '100'
+        }, {
+            city: 'Christiansburg, VA',
+            id: '101'
+        }, {
+            city: 'Columbia, SC',
+            id: '454'
+        }, {
+            city: 'Dallas/Fort Worth, TX',
+            id: '317'
+        }, {
+            city: 'Durham, NC',
+            id: '131'
+        }, {
+            city: 'Fayetteville, NC',
+            id: '455'
+        }, {
+            city: 'Fort Lauderdale, FL',
+            id: '462'
+        }, {
+            city: 'Gainesville, FL',
+            id: '296'
+        }, {
+            city: 'Indianapolis, IN',
+            id: '115'
+        }, {
+            city: 'Jacksonville, FL',
+            id: '295'
+        }, {
+            city: 'Knoxville, TN',
+            id: '118'
+        }, {
+            city: 'Louisville, KY',
+            id: '298'
+        }, {
+            city: 'Memphis, TN',
+            id: '120'
+        }, {
+            city: 'Miami, FL',
+            id: '450'
+        }, {
+            city: 'Mobile, AL',
+            id: '294'
+        }, {
+            city: 'Montgomery, AL',
+            id: '293'
+        }, {
+            city: 'Nashville, TN',
+            id: '291'
+        }, {
+            city: 'New Orleans, LA',
+            id: '303'
+        }, {
+            city: 'New York, NY',
+            id: '123'
+        }, {
+            city: 'Newark, DE',
+            id: '389'
+        }, {
+            city: 'Orlando, FL',
+            id: '297'
+        }, {
+            city: 'Philadelphia, PA',
+            id: '127'
+        }, {
+            city: 'Richmond, VA',
+            id: '132'
+        }, {
+            city: 'Tampa, FL',
+            id: '451'
+        }, {
+            city: 'Tampa\\Mango (P&R), FL',
+            id: '470'
+        }, {
+            city: 'Washington, DC',
+            id: '142'
+        }]
+    };
 
 describe('get all origins', (done) => {
-    it('should return all origin cities and IDs', (done) => {
+    it('should return all origin cities and IDs', () => {
         getAllOrigins().should.eventually.deepEqual(cities);
-        done();
+    });
+});
+describe('get available destinations for an individual city', (done) => {
+    it('should return all available destination cities for an individual city', () => {
+        getAvailableDestinations('Atlanta, GA', cities).then(data => {
+            console.log(data);
+        });
+        getAvailableDestinations('Atlanta, GA', cities).should.eventually.deepEqual(testOrigin);
     });
 });

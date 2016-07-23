@@ -408,9 +408,6 @@ describe('get all origins', (done) => {
 });
 describe('get available destinations for an individual city', (done) => {
     it('should return all available destination cities for an individual city', () => {
-        getAvailableDestinations('Atlanta, GA', cities).then(data => {
-            console.log(data);
-        });
         getAvailableDestinations('Atlanta, GA', cities).should.eventually.deepEqual(testOrigin);
     });
 });

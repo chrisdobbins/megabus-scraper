@@ -1,4 +1,5 @@
 'use strict';
+
 // crawls home page to get origin IDs
 const requestPromise = require('request-promise'),
       cheerio = require('cheerio');

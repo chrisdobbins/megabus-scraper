@@ -1,5 +1,5 @@
 'use strict';
-(function() {
+(function () {
     const requestPromise = require('request-promise'),
         getAllOriginIds = require('./get-all-origins.js'),
         getAvailableDestinations = require('./get-available-destinations.js'),

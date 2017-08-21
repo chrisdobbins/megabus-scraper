@@ -10,10 +10,12 @@ cd megabus-scraper
 ### Examples ###
 #### Round Trip ####
 ```
-node index.js --destination 'Memphis, TN' --origin 'Atlanta, GA' --roundtrip --departure 08/15/17 --return 09/17/17
+node index.js --destination 'Memphis, TN' --origin 'Atlanta, GA' --roundtrip \
+--departure 08/15/17 --return 09/17/17
 
 # get cheapest
-node index.js --destination 'Memphis, TN' --origin 'Atlanta, GA' --cheapest --roundtrip --departure 08/15/17 --return 09/17/17
+node index.js --destination 'Memphis, TN' --origin 'Atlanta, GA' --cheapest \
+--roundtrip --departure 08/15/17 --return 09/17/17
 ```
 
 #### One Way ####

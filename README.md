@@ -1,15 +1,15 @@
 # megabus-scraper
-##How to Use##
-Assuming you've cloned the repo and run npm install, this is how you run this:
+## How to Use ##
+*Note*: Main functionality is commented out for now so I could build out a feature to get the cheapest bus ticket from a range of dates. I realize this should be on a feature branch, but ¯\_(ツ)_/¯.
 
-one-way fares: `node index.js 'Chicago, IL' 'New York, NY' '1/1/2016'`
+`npm install`
+`cd megabus-scraper`
 
-roundtrip fares: `node index.js 'New York, NY' '1/1/16' '2/5/16'`
-
-Right now (7/4/16) this just logs the generated JSON to the console. 
-
-Planned future functionality includes:
-- enabling users to put in a range for inbound, outbound, or both and get the lowest fares for that range
-- adding accessibility options
-- allowing users to plan and price out multi-leg trips 
-  - For instance, there's no direct route between Memphis and NYC, but one can go from Memphis to Atlanta, then Atlanta to NYC. I want to make it easier for the user to plan out such trips
+### Examples ###
+#### Round Trip ####
+`node index.js --destination 'Memphis, TN' --origin 'Atlanta, GA' --roundtrip --departure 08/15/17 --return 09/17/17`
+`# get cheapest
+node index.js --destination 'Memphis, TN' --origin 'Atlanta, GA' --cheapest --roundtrip --departure 08/15/17 --return 09/17/17`
+#### One Way ####
+`node index.js --destination 'Memphis, TN' --origin 'Atlanta, GA' --departure 08/15/17`
+`node index.js --destination 'Memphis, TN' --origin 'Atlanta, GA' --cheapest --departure 08/15/17`

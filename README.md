@@ -1,6 +1,6 @@
 # megabus-scraper
 ## How to Use ##
-*Note*: Main functionality is commented out for now so I could build out a feature to get the cheapest bus ticket from a range of dates. I realize this should be on a feature branch, but ¯\_(ツ)_/¯.
+*Note*: Main functionality is commented out for now so I could build out a feature to get the cheapest bus ticket from a range of dates. I realize this should be on a feature branch, but ¯\\_(ツ)_/¯.
 
 `npm install`
 `cd megabus-scraper`
